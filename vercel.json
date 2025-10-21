@@ -1,19 +1,15 @@
 {
+  "version": 2,
   "builds": [
     {
-      "src": "Deployment/app.py",
+      "src": "deployments/app.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "Deployment/app.py"
+      "dest": "deployments/app.py"
     }
-  ],
-  "functions": {
-    "Deployment/app.py": {
-      "includeFiles": "requirements.txt"
-    }
-  }
+  ]
 }
