@@ -13,7 +13,7 @@
   ],
   "functions": {
     "Deployment/app.py": {
-      "includeFiles": ["requirements.txt"]
+      "includeFiles": "requirements.txt"
     }
   }
 }
