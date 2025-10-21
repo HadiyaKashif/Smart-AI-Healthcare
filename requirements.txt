@@ -13,9 +13,6 @@ chromadb
 faiss-cpu
 tiktoken
 
-# === PDF/Web Loaders (if you later use PDFs) ===
-# pypdf
-
 # === Environment / Vectorization ===
 huggingface-hub
 transformers
@@ -23,6 +20,4 @@ transformers
 # === Email and Utils ===
 email-validator
 
-# === Optional: if using Jupyter or Streamlit for debugging ===
-# ipython
 bs4
