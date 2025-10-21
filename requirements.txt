@@ -1,0 +1,28 @@
+# === Core ===
+flask
+python-dotenv
+requests
+joblib
+
+# === LangChain + Components ===
+langchain
+langchain-community
+langchain-groq
+sentence-transformers
+chromadb
+faiss-cpu
+tiktoken
+
+# === PDF/Web Loaders (if you later use PDFs) ===
+# pypdf
+
+# === Environment / Vectorization ===
+huggingface-hub
+transformers
+
+# === Email and Utils ===
+email-validator
+
+# === Optional: if using Jupyter or Streamlit for debugging ===
+# ipython
+bs4
