@@ -46,7 +46,7 @@ const getRiskConfig = (risk) => {
   }
 };
 const ResultsDisplay = ({ results, onReset }) => {
-  const { risk, explanation, diagnosis, nextSteps, doctors, name } = results || {};
+  const { risk, explanation, diagnosis, nextSteps, hospitals, name } = results || {};
   const config = getRiskConfig(risk);
   const RiskIcon = config.icon;
 
@@ -159,46 +159,51 @@ const ResultsDisplay = ({ results, onReset }) => {
         </motion.div>
       )}
 
-      {/* Doctors Section */}
-      {doctors?.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <Card className="p-6 shadow-soft">
-            <h3 className="text-xl font-semibold mb-4">
-              Nearby Healthcare Professionals
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {doctors.map((doctor, index) => (
-                <Card
-                  key={index}
-                  className="p-4 border-2 border-border hover:border-primary transition-colors"
+      {/* hospitals Section */}
+      {hospitals?.length > 0 && (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.5 }}
+  >
+    <Card className="p-6 shadow-soft">
+      <h3 className="text-xl font-semibold mb-4">
+        Nearby Hospitals & Clinics
+      </h3>
+      <div className="grid md:grid-cols-2 gap-4">
+        {hospitals.map((hospital, index) => (
+          <Card
+            key={index}
+            className="p-4 border-2 border-border hover:border-primary transition-colors"
+          >
+            <h4 className="font-semibold text-lg mb-1">{hospital.name}</h4>
+            <p className="text-sm text-muted-foreground mb-2">
+              {hospital.type || "General"}
+            </p>
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <MapPin className="w-4 h-4 mt-0.5 text-primary" />
+              <div className="flex flex-col">
+                <span>
+                  {hospital.address && hospital.address !== "N/A"
+                    ? hospital.address
+                    : "Address not available"}
+                </span>
+                <a
+                  href={`https://www.google.com/maps?q=${hospital.latitude},${hospital.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline mt-1"
                 >
-                  <h4 className="font-semibold text-lg mb-2">{doctor.name}</h4>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {doctor.specialty}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-4 h-4" />
-                    <span>{doctor.distance_km} km away</span>
-                  </div>
-                  {doctor.email && doctor.email !== "N/A" && (
-                    <a
-                      href={`mailto:${doctor.email}`}
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Contact
-                    </a>
-                  )}
-                </Card>
-              ))}
+                  View on Google Maps
+                </a>
+              </div>
             </div>
           </Card>
-        </motion.div>
-      )}
+        ))}
+      </div>
+    </Card>
+  </motion.div>
+)}
 
       {/* Reset Button */}
       <div className="flex justify-center gap-4 pt-6">

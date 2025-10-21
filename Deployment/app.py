@@ -120,41 +120,48 @@ def send_email_alert(to_email, risk, explanation, nextSteps, user_name):
         print(f"📧 Alert email sent to {to_email}")
 
     except Exception as e:
-        print("⚠️ Email send failed:", e)# ================== OpenStreetMap Doctor Search ==================
+        print("⚠️ Email send failed:", e)
 
-def find_nearby_doctors(lat, lon, radius_km=10):
-    """Use Overpass API to find nearby doctors within a given radius"""
+# ================== OpenStreetMap Doctor Search ==================
+def find_nearby_hospitals(lat, lon, radius_m=5000):
+    """
+    Use Overpass API to find nearby hospitals within the specified radius (meters)
+    """
     try:
         query = f"""
         [out:json];
         (
-          node["amenity"="doctors"](around:{radius_km * 1000},{lat},{lon});
-          node["healthcare"="doctor"](around:{radius_km * 1000},{lat},{lon});
+          node["amenity"="hospital"](around:{radius_m},{lat},{lon});
+          way["amenity"="hospital"](around:{radius_m},{lat},{lon});
+          relation["amenity"="hospital"](around:{radius_m},{lat},{lon});
         );
-        out body;
+        out center;
         """
-        response = requests.post("https://overpass-api.de/api/interpreter", data={"data": query}, timeout=15)
+        response = requests.post("https://overpass-api.de/api/interpreter", data={"data": query}, timeout=20)
         data = response.json()
 
-        doctors = []
-        for element in data.get("elements", [])[:5]:  # limit to 5 doctors
-            name = element.get("tags", {}).get("name", "Unnamed Doctor")
-            specialty = element.get("tags", {}).get("specialty", "General Practitioner")
-            email = element.get("tags", {}).get("email", "N/A")
-            distance_km = round(radius_km * 0.3 + (0.5 * len(doctors)), 1)  # fake distance approximation
-
-            doctors.append({
+        hospitals = []
+        for element in data.get("elements", [])[:5]:  # limit to 5 hospitals
+            tags = element.get("tags", {})
+            name = tags.get("name", "Unnamed Hospital")
+            hospital_type = tags.get("hospital:type", "General")
+            address = tags.get("address", tags.get("addr:street", "N/A"))
+            lat_h = element.get("lat") or element.get("center", {}).get("lat")
+            lon_h = element.get("lon") or element.get("center", {}).get("lon")
+            hospitals.append({
                 "name": name,
-                "specialty": specialty,
-                "distance_km": distance_km,
-                "email": email
+                "type": hospital_type,
+                "address": address,
+                "latitude": lat_h,
+                "longitude": lon_h
             })
-        return doctors
+
+        return hospitals
 
     except Exception as e:
-        print("⚠️ Doctor lookup failed:", e)
+        print("⚠️ Hospital lookup failed:", e)
         return []
-
+    
 # ================== Risk Prediction ==================
 def classify_risk(input_data: dict) -> str:
     try:
@@ -200,29 +207,29 @@ def analyze():
         user_name = data["Name"]
         risk = classify_risk(data)
         rag_result = query_rag(data, risk)
-        explination = rag_result.get("explanation", [])
+        explanation = rag_result.get("explanation", [])
         diagnosis = rag_result.get("diagnosis", [])
         next_steps = rag_result.get("nextSteps", [])
 
-        doctors = find_nearby_doctors(data["Latitude"], data["Longitude"])
+        hospitals = find_nearby_hospitals(data["Latitude"], data["Longitude"])
 
         if risk == "Bad":
-            send_email_alert(data["Email"], risk, explination, next_steps, user_name)
+            send_email_alert(data["Email"], risk, explanation, next_steps, user_name)
 
         response = {
             "name": user_name,
             "risk": risk,
-            "explanation" : explination,
-            "diagnosis" : diagnosis,
-            "nextSteps" :  next_steps,  
-            "doctors": doctors
+            "explanation": explanation,
+            "diagnosis": diagnosis,
+            "nextSteps": next_steps,
+            "hospitals": hospitals
         }
         return jsonify(response)
 
     except Exception as e:
         print("❌ Error in /analyze:", e)
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500  
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/", methods=["GET"])

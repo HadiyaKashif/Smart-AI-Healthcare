@@ -42,7 +42,7 @@ const handleFormSubmit = async (formData) => {
     const data = await response.json();
     
     // Updated destructuring to match new response structure
-    const { risk, explanation, diagnosis, nextSteps, doctors, name } = data;
+    const { risk, explanation, diagnosis, nextSteps, hospitals, name } = data;
 
     // Simulate processing time for animation
     setTimeout(() => {
@@ -51,7 +51,7 @@ const handleFormSubmit = async (formData) => {
         explanation, 
         diagnosis,
         nextSteps,
-        doctors,
+        hospitals,
         name 
       });
       setStage("results");
@@ -63,7 +63,7 @@ const handleFormSubmit = async (formData) => {
     setTimeout(() => {
       setResults({
         name: "Test Patient",
-        risk: "FALLBACK Risk",
+        risk: "Some Risk",
         explanation: "Based on your recent readings, we've categorized your risk as Moderate to High.",
         diagnosis: "Your pattern of vitals is commonly associated with Primary Hypertension.",
         nextSteps: [
